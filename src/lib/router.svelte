@@ -32,7 +32,7 @@
         result: r
       }
     });
-    
+
     // The {#key} block handles component lifecycle automatically
     // No manual unmounting needed - Svelte manages this for us
 
@@ -44,7 +44,7 @@
       // Handle regular component by directly assigning the component:
       RenderableComponent = r.result.component;
     }
-    
+
     // Force reactivity by updating route state after component assignment
     route = { ...r };
     additionalProps = route.route?.props;
@@ -82,7 +82,7 @@
   const { routes, basePath, ...restWithoutRoutes } = rest;
 </script>
 
-{#key route?.result?.path?.original || Math.random()}
+{#key route?.result?.path?.original || route?.result?.path?.condition || 'no-route'}
   <RenderableComponent
     {route}
     {...additionalProps}

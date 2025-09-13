@@ -202,20 +202,23 @@ export class RouterInstance {
         }
       }
 
-      const isSameRoute = this.current && 
+      const isSameRoute = this.current &&
         this.current.result.path.original === result.result.path.original &&
         JSON.stringify(this.current.result.querystring.params) === JSON.stringify(result.result.querystring.params);
-      
-      // This ensures components re-mount for both same routes and different routes using same component
-      const shouldApply = this.config.renavigation !== false;
-      
+
+      // Check if we should apply the route
+      const shouldApply = !isSameRoute || this.config.renavigation !== false;
+
       if (shouldApply) {
-        this.current = undefined;
-        
+        // Only set current to undefined if it's the same route and we want to force remount
+        if (isSameRoute && this.config.renavigation !== false) {
+          this.current = undefined;
+        }
+
         span?.trace({
           prefix: isSameRoute ? "🔄" : "✅",
           name: "router-instance.applyRoute",
-          description: isSameRoute ? 
+          description: isSameRoute ?
             `re-mounting same route "${result.result.path.original}" (renavigation enabled)` :
             `applying new route "${result.result.path.original}"`,
           metadata: {
@@ -229,10 +232,10 @@ export class RouterInstance {
             result
           }
         });
-        
+
         // Contact the downstream router component to apply the route:
         this.applyFn(result, span);
-        
+
         this.current = result;
       } else {
         span?.trace({
@@ -250,7 +253,7 @@ export class RouterInstance {
             result
           }
         });
-        
+
         this.current = result;
       }
 
